@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>RGB Flies</title>
+  </head>
+  <body style="margin: 10px; background-color: #eee; font-family: Arial">
+    <div id="debug"></div>
+    <h1>Color your scout flies!</h1>
+    <h2 style="text-indent: 20px">Normal: <input type="color" id="normal" onchange="changeNormal()"/></h2>
+    <h2 style="text-indent: 20px">Elder: <input type="color" id="elder" onchange="changeElder()"/></h2>
+    <h2 style="text-indent: 20px">Tempered: <input type="color" id="tempered" onchange="changeTempered()"/></h2>
+
+    <script>
+      const { ipcRenderer } = require('electron')
+      const debug = document.getElementById("debug")
+      var nodeConsole = require('console');
+      var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+
+      ipcRenderer.on('normalFly', function (event, arr) {
+        var color = translateDec(arr)
+        document.getElementById("normal").value = color
+      })
+
+      function changeNormal() {
+        var value = document.getElementById("normal").value
+        var color = translateHex(value)
+        ipcRenderer.send('changeNormal', color)
+      }
+
+      ipcRenderer.on('elderFly', function (event, arr) {
+        var color = translateDec(arr)
+        document.getElementById("elder").value = color
+      })
+
+      function changeElder() {
+        var value = document.getElementById("elder").value
+        var color = translateHex(value)
+        ipcRenderer.send('changeElder', color)
+      }
+
+      ipcRenderer.on('temperedFly', function (event, arr) {
+        var color = translateDec(arr)
+        document.getElementById("tempered").value = color
+      })
+
+      function changeTempered() {
+        var value = document.getElementById("tempered").value
+        var color = translateHex(value)
+        ipcRenderer.send('changeTempered', color)
+      }
+
+      function translateDec(arr) {
+        var r = "0" + arr[0].toString(16)
+        r = r.slice(-2)
+        var g = "0" + arr[1].toString(16)
+        g = g.slice(-2)
+        var b = "0" + arr[2].toString(16)
+        b = b.slice(-2)
+        return "#" + r + g + b
+      }
+
+      function translateHex(value) {
+        return [parseInt(value.charAt(1),16)*16+parseInt(value.charAt(2),16), parseInt(value.charAt(3),16)*16+parseInt(value.charAt(4),16),parseInt(value.charAt(5),16)*16+parseInt(value.charAt(6),16)]
+      }
+    </script>
+  </body>
+</html>
